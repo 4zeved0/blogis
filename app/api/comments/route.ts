@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@sanity/client'
 
-export const client = createClient({
+const client = createClient({
   projectId: 'ulzdyd69',
   dataset: 'production',
   useCdn: true, // set to `false` to bypass the edge cache
@@ -42,7 +42,6 @@ export async function GET(req: Request) {
       }`,
     { postId }
   )
-
 
   return NextResponse.json(comments)
 }
