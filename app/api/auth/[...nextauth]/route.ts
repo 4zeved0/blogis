@@ -4,44 +4,19 @@ import EmailProvider from "next-auth/providers/email";
 import nodemailer, { Transporter } from "nodemailer";
 import { createStorage } from "unstorage";
 
+// Criação do storage para adapter
+const storage = createStorage();
 
-type JWType = {
-  token: {
-    id: string,
-    email: string
-  }
-  account: any,
-  user: {
-    id: string,
-    email: string
-  }
-}
-
-type SessionType = {
-  token: {
-    id: string,
-    email: string
-  }
-  session: {
-    accessToken: string,
-    user: {
-      id: string
-    }
-  },
-}
-
-export async function sendVerificationRequest({
+// ⚠️ ATENÇÃO: função interna, não exportada!
+async function sendVerificationRequest({
   identifier,
   url,
   provider,
-}:
-  {
-    identifier: string;
-    url: string;
-    provider: any;
-  }
-) {
-
+}: {
+  identifier: string;
+  url: string;
+  provider: any;
+}) {
   const transporter: Transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -54,7 +29,7 @@ export async function sendVerificationRequest({
     to: identifier,
     from: provider.from,
     subject: `Bem-vindo ao nosso site!`,
-    text: `Link para acessar o nosso site, ${url}`,
+    text: `Link para acessar o nosso site: ${url}`,
   });
 
   const failed = result.rejected.concat(result.pending).filter(Boolean);
@@ -63,9 +38,34 @@ export async function sendVerificationRequest({
   }
 }
 
-const storage = createStorage();
+// Tipagens
+type JWType = {
+  token: {
+    id: string;
+    email: string;
+  };
+  account: any;
+  user: {
+    id: string;
+    email: string;
+  };
+};
 
-export const authOptions = {
+type SessionType = {
+  token: {
+    id: string;
+    email: string;
+  };
+  session: {
+    accessToken: string;
+    user: {
+      id: string;
+    };
+  };
+};
+
+// Configurações do NextAuth
+const handler = NextAuth({
   adapter: UnstorageAdapter(storage),
   secret: process.env.AUTH_SECRET,
   providers: [
@@ -77,7 +77,7 @@ export const authOptions = {
   ],
   session: {
     strategy: "jwt",
-    maxAge: 24 * 60 * 60,  // 1 dia
+    maxAge: 24 * 60 * 60, // 1 dia
   },
   pages: {
     signIn: "/login",
@@ -95,8 +95,8 @@ export const authOptions = {
       session.user.id = token.id;
       return session;
     },
-  }
-}
+  },
+});
 
-const handler = NextAuth(authOptions as any);
+// Exportações corretas para App Router
 export { handler as GET, handler as POST };
