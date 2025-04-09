@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Localization {
+  id          Int          @id @default(autoincrement())
+  name        String // Adicione um nome para identificar a localização
+  datacenters Datacenter[]
+}
+
+model Datacenter {
+  id             Int           @id @default(autoincrement())
+  name           String
+  Localization   Localization? @relation(fields: [localizationId], references: [id])
+  localizationId Int?
+  Rack           Rack[]
+}
+
+model Rack {
+  rackNumber   Int          @id
+  Datacenter   Datacenter   @relation(fields: [datacenterId], references: [id])
+  datacenterId Int
+  equipaments  Equipament[]
+  powerstrips  PowerStrip[]
+}
+
+model Equipament {
+  id              Int     @id @default(autoincrement())
+  model           String
+  hostname        String?
+  client          String?
+  serialNumber    String?
+  status          Boolean
+  spaceQuantity   Int
+  equipamentType  String
+  assetNumber     Int
+  equipamentBrand String
+  positionInRack  Int
+  observations    String?
+  Rack            Rack    @relation(fields: [rackRackNumber], references: [rackNumber])
+  rackRackNumber  Int
+}
+
+model PowerStrip {
+  powerStripNumber Int    @id
+  numberKva        Int
+  powerStripColor  String
+  Rack             Rack   @relation(fields: [rackRackNumber], references: [rackNumber])
+  rackRackNumber   Int
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  surname   String
+  updatedAt DateTime @updatedAt // Corrigindo `updateAt` para `updatedAt`
+}
