@@ -1,13 +1,11 @@
 import { UnstorageAdapter } from "@auth/unstorage-adapter";
 import NextAuth from "next-auth";
 import EmailProvider from "next-auth/providers/email";
-import nodemailer, { Transporter } from "nodemailer";
+import nodemailer from "nodemailer";
 import { createStorage } from "unstorage";
 
-// Criação do storage para adapter
 const storage = createStorage();
 
-// ⚠️ ATENÇÃO: função interna, não exportada!
 async function sendVerificationRequest({
   identifier,
   url,
@@ -17,7 +15,7 @@ async function sendVerificationRequest({
   url: string;
   provider: any;
 }) {
-  const transporter: Transporter = nodemailer.createTransport({
+  const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
       user: process.env.EMAIL_USER,
@@ -28,7 +26,7 @@ async function sendVerificationRequest({
   const result = await transporter.sendMail({
     to: identifier,
     from: provider.from,
-    subject: `Bem-vindo ao nosso site!`,
+    subject: "Bem-vindo ao nosso site!",
     text: `Link para acessar o nosso site: ${url}`,
   });
 
@@ -38,44 +36,6 @@ async function sendVerificationRequest({
   }
 }
 
-// Tipagens
-type JWType = {
-  token: {
-    id: string;
-    email: string;
-  };
-  account: any;
-  user: {
-    id: string;
-    email: string;
-  };
-};
-
-type SessionType = {
-  session: {
-    user: {
-      name?: string | null;
-      email?: string | null;
-      image?: string | null;
-      id?: string;
-    };
-    expires: string;
-    accessToken?: string;
-  };
-  token: {
-    id?: string;
-    email?: string;
-    accessToken?: string;
-    [key: string]: any;
-  };
-  user?: {
-    id?: string;
-    email?: string;
-  };
-};
-
-
-// Configurações do NextAuth
 const handler = NextAuth({
   adapter: UnstorageAdapter(storage),
   secret: process.env.AUTH_SECRET,
@@ -88,7 +48,7 @@ const handler = NextAuth({
   ],
   session: {
     strategy: "jwt",
-    maxAge: 24 * 60 * 60, // 1 dia
+    maxAge: 86400,
   },
   pages: {
     signIn: "/login",
@@ -96,22 +56,17 @@ const handler = NextAuth({
   callbacks: {
     async jwt({ token, account, user }) {
       if (account && user) {
-        token.email = user.email
-        token.id = user.id
+        token.email = user.email;
+        token.id = user.id;
       }
-
-      return token
+      return token;
     },
-    async session({ session, token, user }) {
-      // Send properties to the client, like an access_token and user id from a provider.
-      session.accessToken = token.accessToken
-      session.user.id = token.id
-
-      return session
-    }
-  }
-},
+    async session({ session, token }) {
+      session.user.id = token.id;
+      session.accessToken = token.accessToken;
+      return session;
+    },
+  },
 });
 
-// Exportações corretas para App Router
 export { handler as GET, handler as POST };
