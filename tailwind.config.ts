@@ -17,7 +17,7 @@ module.exports = {
   },
   plugins: [
     require('@tailwindcss/typography'),
-    plugin(function ({ addBase }) {
+    plugin(function ({ addBase }: any) {
       addBase({
         ':root': {
           '--color-bg': '30 27 46',            // #1E1B2E

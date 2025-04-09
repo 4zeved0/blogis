@@ -3,18 +3,16 @@ import NextAuth from "next-auth";
 import EmailProvider from "next-auth/providers/email";
 import nodemailer from "nodemailer";
 import { createStorage } from "unstorage";
+import type { SendVerificationRequestParams } from "next-auth/providers/email";
+
 
 const storage = createStorage();
 
-async function sendVerificationRequest({
+const sendVerificationRequest = async ({
   identifier,
   url,
   provider,
-}: {
-  identifier: string;
-  url: string;
-  provider: any;
-}) {
+}: SendVerificationRequestParams) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -26,7 +24,7 @@ async function sendVerificationRequest({
   const result = await transporter.sendMail({
     to: identifier,
     from: provider.from,
-    subject: "Bem-vindo ao nosso site!",
+    subject: `Bem-vindo ao nosso site!`,
     text: `Link para acessar o nosso site: ${url}`,
   });
 
@@ -34,7 +32,8 @@ async function sendVerificationRequest({
   if (failed.length) {
     throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`);
   }
-}
+};
+
 
 const handler = NextAuth({
   adapter: UnstorageAdapter(storage),
@@ -48,24 +47,36 @@ const handler = NextAuth({
   ],
   session: {
     strategy: "jwt",
-    maxAge: 86400,
+    maxAge: 24 * 60 * 60,
   },
   pages: {
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, account, user }) {
-      if (account && user) {
-        token.email = user.email;
+    async jwt({ token, user }) {
+      if (user) {
         token.id = user.id;
+        token.email = user.email;
       }
       return token;
     },
     async session({ session, token }) {
-      session.user.id = token.id;
+      if (!session.user) {
+        session.user = {
+          id: token.id as string,
+          name: null,
+          email: token.email ?? null,
+          image: null,
+        };
+
+      }
+
+      session.user.id = token.id as string;
       session.accessToken = token.accessToken;
+
       return session;
-    },
+    }
+
   },
 });
 

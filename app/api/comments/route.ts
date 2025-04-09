@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@sanity/client'
+import { createClient, type ClientConfig } from '@sanity/client'
 
 const client = createClient({
   projectId: 'ulzdyd69',
