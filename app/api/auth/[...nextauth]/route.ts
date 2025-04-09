@@ -52,17 +52,28 @@ type JWType = {
 };
 
 type SessionType = {
-  token: {
-    id: string;
-    email: string;
-  };
   session: {
-    accessToken: string;
     user: {
-      id: string;
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+      id?: string;
     };
+    expires: string;
+    accessToken?: string;
+  };
+  token: {
+    id?: string;
+    email?: string;
+    accessToken?: string;
+    [key: string]: any;
+  };
+  user?: {
+    id?: string;
+    email?: string;
   };
 };
+
 
 // Configurações do NextAuth
 const handler = NextAuth({
@@ -83,19 +94,23 @@ const handler = NextAuth({
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, account, user }: JWType) {
+    async jwt({ token, account, user }) {
       if (account && user) {
-        token.email = user.email;
-        token.id = user.id;
+        token.email = user.email
+        token.id = user.id
       }
-      return token;
+
+      return token
     },
-    async session({ session, token }: SessionType) {
-      session.accessToken = token.email;
-      session.user.id = token.id;
-      return session;
-    },
-  },
+    async session({ session, token, user }) {
+      // Send properties to the client, like an access_token and user id from a provider.
+      session.accessToken = token.accessToken
+      session.user.id = token.id
+
+      return session
+    }
+  }
+},
 });
 
 // Exportações corretas para App Router
