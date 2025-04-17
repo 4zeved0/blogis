@@ -17,7 +17,9 @@ interface PostCardProps {
       _ref: string
     }
   }
+  categories?: { title: string }[]
 }
+
 
 interface Span {
   _key: string
@@ -52,7 +54,8 @@ export default function PostCard({
   body,
   publishedAt,
   author,
-  mainImage
+  mainImage,
+  categories,
 }: PostCardProps) {
   const plainText = getPlainText(body)
   const preview =
@@ -68,15 +71,20 @@ export default function PostCard({
 
   return (
     <Link key={id} href={`/posts/${slug}`} passHref>
-      <article className="bg-card border border-border rounded-2xl p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.01] flex flex-col gap-4 h-[420px]  hover:ring-1 hover:ring-primary">
+      <article className="relative bg-card border border-border rounded p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.01] flex flex-col gap-4 h-[420px] hover:ring-1 hover:ring-primary">
+        {/* Se a categoria for "relevant", coloca a estrela */}
+        {categories?.some(cat => cat.title.toLowerCase() === 'relevant') && (
+          <span className="absolute top-2 right-2 text-yellow-400 text-lg">⭐</span>
+        )}
+
         {mainImage?.asset?._ref ? (
           <img
             src={urlFor(mainImage.asset._ref).width(800).height(400).url()}
             alt={`Imagem de ${title}`}
-            className="w-full h-44 object-cover rounded-xl"
+            className="w-full h-44 object-cover rounded"
           />
         ) : (
-          <div className="w-full h-44 bg-muted rounded-xl flex items-center justify-center text-sm text-muted-foreground">
+          <div className="w-full h-44 bg-muted rounded flex items-center justify-center text-sm text-muted-foreground">
             Sem imagem
           </div>
         )}

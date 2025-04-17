@@ -13,6 +13,9 @@ module.exports = {
         textMuted: 'rgb(var(--color-text-muted) / <alpha-value>)',
         border: 'rgb(var(--color-border) / <alpha-value>)',
       },
+      animation: {
+        'fade-in': 'fade-in 0.8s ease-out forwards',
+      },
     },
   },
   plugins: [

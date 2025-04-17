@@ -60,6 +60,8 @@ export function CommentSection({ postId }: { postId: string }) {
       setLoading(false)
     }
   }
+  const { data: data } = useSession()
+
 
   return (
     <section className="mt-24 border-t border-border pt-12">
@@ -70,7 +72,7 @@ export function CommentSection({ postId }: { postId: string }) {
           {comments.map((c) => (
             <li
               key={c._id}
-              className="border border-border p-4 rounded-lg bg-surface hover:ring-1 hover:ring-primary"
+              className="border border-border p-4 rounded bg-surface hover:ring-1 hover:ring-primary"
             >
               <p className="text-sm text-text mb-1">{c.comment}</p>
               <span className="text-xs text-textMuted">
@@ -89,67 +91,75 @@ export function CommentSection({ postId }: { postId: string }) {
           Nenhum comentário ainda.
         </p>
       )}
+      {data ?
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="name" className="block text-sm text-textMuted mb-1">
+                Nome
+              </label>
+              <input
+                type="text"
+                id="name"
+                placeholder="Seu nome"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="w-full px-3 py-2 bg-surface text-text border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary text-sm"
+              />
+            </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="email" className="block text-sm text-textMuted mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                readOnly
+                disabled
+                required
+                className="w-full px-3 py-2 bg-surface text-textMuted border border-border rounded text-sm cursor-not-allowed"
+              />
+            </div>
+          </div>
+
           <div>
-            <label htmlFor="name" className="block text-sm text-textMuted mb-1">
-              Nome
+            <label htmlFor="comment" className="block text-sm text-textMuted mb-1">
+              Comentário
             </label>
-            <input
-              type="text"
-              id="name"
-              placeholder="Seu nome"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+            <textarea
+              id="comment"
+              placeholder="Escreva algo..."
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
               required
-              className="w-full px-3 py-2 bg-surface text-text border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary text-sm"
+              className="w-full px-3 py-2 bg-surface text-text border border-border rounded h-28 resize-none focus:outline-none focus:ring-1 focus:ring-primary text-sm"
             />
           </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm text-textMuted mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              readOnly
-              disabled
-              className="w-full px-3 py-2 bg-surface text-textMuted border border-border rounded text-sm cursor-not-allowed"
-            />
-          </div>
-        </div>
+          <div className="flex items-center justify-end gap-4">
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-primary text-white px-5 py-2 rounded text-sm font-medium disabled:opacity-50"
+            >
+              {loading ? 'Enviando...' : 'Enviar'}
+            </button>
 
+            {submitted && (
+              <span className="text-green-400 text-sm">Comentário enviado!</span>
+            )}
+          </div>
+        </form>
+        :
         <div>
-          <label htmlFor="comment" className="block text-sm text-textMuted mb-1">
-            Comentário
-          </label>
-          <textarea
-            id="comment"
-            placeholder="Escreva algo..."
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            required
-            className="w-full px-3 py-2 bg-surface text-text border border-border rounded h-28 resize-none focus:outline-none focus:ring-1 focus:ring-primary text-sm"
-          />
+          <h3 className='text-center'>Faça login para enviar um comentário.</h3>
         </div>
+      }
 
-        <div className="flex items-center justify-end gap-4">
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-primary text-white px-5 py-2 rounded text-sm font-medium disabled:opacity-50"
-          >
-            {loading ? 'Enviando...' : 'Enviar'}
-          </button>
 
-          {submitted && (
-            <span className="text-green-400 text-sm">Comentário enviado!</span>
-          )}
-        </div>
-      </form>
     </section>
 
   )

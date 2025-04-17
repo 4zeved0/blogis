@@ -3,17 +3,20 @@ import { groq } from 'next-sanity'
 
 export async function getPosts() {
   const query = `
-  *[_type == "post"]{
-    _id,
-    title,
-    slug,
-    body,
-    publishedAt,
-    mainImage,
-    author->{
-      name
+    *[_type == "post"]{
+      _id,
+      title,
+      slug,
+      body,
+      publishedAt,
+      mainImage,
+      author->{
+        name
+      },
+      categories[]->{
+        title
+      }
     }
-  }
   `
   return await client.fetch(query)
 }

@@ -1,8 +1,8 @@
 export default function SkeletonPostCard() {
   return (
-    <div className="animate-pulse bg-muted dark:bg-[#1e1e1e] rounded-2xl p-4 shadow-md flex flex-col gap-4">
+    <div className="animate-pulse bg-muted dark:bg-[#1e1e1e] rounded p-4 shadow-md flex flex-col gap-4">
       {/* Imagem */}
-      <div className="h-44 bg-surface dark:bg-[#2a2a2a] rounded-xl" />
+      <div className="h-44 bg-surface dark:bg-[#2a2a2a] rounded" />
 
       {/* Título */}
       <div className="h-6 bg-surface dark:bg-[#2a2a2a] rounded w-4/5" />
