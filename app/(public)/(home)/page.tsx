@@ -12,7 +12,6 @@ import PostCard from '@/app/components/PostCard'
 import SkeletonPostCard from '@/app/components/SkepetonPostCard'
 import { authors } from '@/app/data/Authors'
 import SearchBar from '@/app/components/SearchBar'
-import AboutProject from '@/app/components/AboutProject'
 
 interface Post {
   _id: string
